@@ -21,7 +21,7 @@ for /f "delims=" %%a in (%training_data%) do (
 
 REM Load other .txt files in the directory as training data
 for %%F in (*.txt) do (
-    if "%%F" neq "thoughts.txt" (
+    if /i "%%F" neq "thoughts.txt" (
         for /f "delims=" %%a in (%%F) do (
             set /a "thought_count+=1"
             set "thought[!thought_count!]=%%a"
@@ -60,7 +60,10 @@ set /p "user_input=User: "
 if /i "%user_input%"=="q" goto :eof
 
 REM Save user input to thoughts
-echo %user_input% >> %training_data%
+echo User: %user_input% >> %training_data%
+
+REM Display user input
+echo User: %user_input%
 
 REM Check if the user is asking about thoughts
 if /i "%user_input%"=="What are your thoughts today?" (
@@ -75,10 +78,12 @@ if /i "%user_input%"=="What are your thoughts today?" (
 
 REM Chat with the bot
 call :chat "%user_input%" response
-echo Bot: !response!
 
 REM Save bot response to thoughts
 echo Bot: !response! >> %training_data%
+
+REM Display bot response
+echo Bot: !response!
 
 REM Save conversation to brain
 if defined brain[%user_input%] (
@@ -110,7 +115,7 @@ set "response=I don't understand."
 REM Analyze user input patterns and adjust bot's responses accordingly
 if defined brain[%phrase%] (
     set /a "pattern_count=0"
-    for /l %%i in (1,2,%brain_count%) do (
+    for /l %%i in (1,1,%brain_count%) do (
         set /a "j=%%i+1"
         if "!brain[%%i]!"=="%phrase%" (
             set /a "pattern_count+=1"
