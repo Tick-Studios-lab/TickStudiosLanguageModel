@@ -72,8 +72,11 @@ set "letters="
 set /p "user_input=User: "
 if /i "%user_input%"=="q" goto :eof
 
+REM Display user input
+echo User: %user_input%
+
 REM Save user input to thoughts
-echo %user_input% >> %training_data%
+echo User: %user_input% >> %training_data%
 
 REM Check if the user is asking about thoughts or code
 if /i "%user_input%"=="What are your thoughts today?" (
@@ -96,6 +99,8 @@ if /i "%user_input%"=="What are your thoughts today?" (
 
 REM Chat with the bot
 call :chat "%user_input%" response
+
+REM Display bot response
 echo Bot: !response!
 
 REM Save bot response to thoughts
@@ -131,7 +136,7 @@ set "response=I don't understand."
 REM Analyze user input patterns and adjust bot's responses accordingly
 if defined brain[%phrase%] (
     set /a "pattern_count=0"
-    for /l %%i in (1,2,%brain_count%) do (
+    for /l %%i in (1,1,%brain_count%) do (
         set /a "j=%%i+1"
         if "!brain[%%i]!"=="%phrase%" (
             set /a "pattern_count+=1"
