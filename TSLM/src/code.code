@@ -1,155 +1,67 @@
-%rax %eax %ax %al
-%rcx %ecx %cx %cl
-%rdx %edx %dx %dl
-%rbx %ebx %bx %bl
-%rsi %esi %si %sil
-%rdi %edi %di %dil
-%rsp %esp %sp %spl
-%rbp %ebp %bp %bpl
-%r8 %r8d %r8w %r8b
-%r9 %r9d %r9w %r9b
-%r10 %r10d %r10w %r10b
-%r11 %r11d %r11w %r11b
-%r12 %r12d %r12w %r12b
-%r13 %r13d %r13w %r13b
-%r14 %r14d %r14w %r14b
-%r15 %r15d %r15w %r15b
-1 byte opcodes Rev 2, 2021-12-14 ALU op
-ALU r, r/m 0 0 op 0 d w mod reg r/m ADD 0 0 0
-ALU accum, imm 0 0 op 1 0 w +imm OR 0 0 1
-PUSH/POP segment 0 0 0 seg 1 1 op seg:op ≠ 01:1 ADC 0 1 0
-286+ two byte OP codes 0 0 0 0 1 1 1 1 +instruction SBB 0 1 1
-segment prefixes 0 0 1 seg 1 1 0 AND 1 0 0
-BCD adjustments 0 0 1 op 1 1 1 SUB 1 0 1
-INC/DEC rw 0 1 0 0 op reg XOR 1 1 0
-PUSH/POP rw 0 1 0 1 op reg CMP 1 1 1
-186+ PUSHA/POPA 0 1 1 0 0 0 0 op
-186+/286+ BOUND/ARPL 0 1 1 0 0 0 1 op mod reg r/m SHIFT op
-386+ FS/GS/D32/A32 prefixes 0 1 1 0 0 1 op ROL 0 0 0
-186+ PUSH imm 0 1 1 0 1 0 s 0 +imm ROR 0 0 1
-186+ IMUL r, r/m, imm 0 1 1 0 1 0 s 1 mod reg r/m +imm RCL 0 1 0
-186+ string port IO 0 1 1 0 1 1 d w RCR 0 1 1
-conditional jumps (short) 0 1 1 1 cc n +rel8 SHL 1 0
-ALU r/m, imm 1 0 0 0 0 0 s w mod op r/m SHR 1 0 1
-TEST/XCHG r/m, r 1 0 0 0 0 1 op w mod reg r/m SAR 1 1 1
-MOV r, r/m 1 0 0 0 1 0 d w mod reg r/m
-MOV seg, r/m 1 0 0 0 1 1 d 0 mod seg r/m single operand op
-LEA r, m 1 0 0 0 1 1 0 1 mod reg r/m NOT 0 1 0
-POP r/m 1 0 0 0 1 1 1 1 mod 0 0 0 r/m NEG 0 1 1
-XCHG accum, rw 1 0 0 1 0 reg MUL 1 0 0
-CBW, CWD 1 0 0 1 1 0 0 op IMUL 1 0 1
-CALL FAR seg:off 1 0 0 1 1 0 1 0 +seg:off DIV 1 1 0
-WAIT 1 0 0 1 1 0 1 1 IDIV 1 1 1
-flag register access 1 0 0 1 1 1 op
-MOV accum, off 1 0 1 0 0 0 d w +off bit test op
-TEST accum, imm 1 0 1 0 1 0 0 w +imm BT 0 0
-string operations 1 0 1 0 op w op ≠ 00?, op ≠ 100 BTS 0 1
-MOV r, imm 1 0 1 1 w reg +imm BTR 1 0
-186+ SHIFT r/m, imm 1 1 0 0 0 0 0 w mod op r/m BTC 1 1
-RET 1 1 0 0 f 0 1 i if i = 1 then +imm16
-LES/LDS 1 1 0 0 0 1 0 op mod reg r/m
-MOV r/m, imm 1 1 0 0 0 1 1 w mod reg r/m +imm
-mod ≠ 11
-mod ≠ 11
-186+ ENTER 1 1 0 0 1 0 0 0 +imm16+imm8 condition codes
-186+ LEAVE 1 1 0 0 1 0 0 1 O 0 0 0
-interrupt handling 1 1 0 0 1 1 op if op = 01 then +imm8 B/C 0 0 1
-SHIFT r/m, 1/CL 1 1 0 1 0 0 cl w mod op r/m E/Z 0 1 0
-AAM/AAD 1 1 0 1 0 1 0 op +imm8 BE 0 1 1
-SALC/XLAT 1 1 0 1 0 1 1 op S 1 0 0
-coprocessor escape 1 1 0 1 1 mod r/m P/PE 1 0 1
-loop instructions 1 1 1 0 0 0 op +imm8 L 1 1 0
-port IO 1 1 1 0 i 1 d w if i = 1 then +imm8 LE 1 1 1
-calls and jumps 1 1 1 0 1 0 op +...
-F0 group prefixes 1 1 1 1 0 0 op SYSTEM op
-HLT/CMC 1 1 1 1 0 1 0 op SLDT 0 0 0 0
-TEST r/m, imm 1 1 1 1 0 1 1 w mod 0 0 r/m +imm STR 0 0 0 1
-ALU r/m (single operand) 1 1 1 1 0 1 1 w mod op r/m op ≠ 00? LLDT 0 0 1 0
-set/clear flags 1 1 1 1 1 op c LTR 0 0 1 1
-single operand misc 1 1 1 1 1 1 1 w mod op r/m VERR 0 1 0 0
-VERW 0 1 0 1
-2 byte opcodes SGDT 1 0 0 0
-286+ SYSTEM r/m 0F 0 0 0 0 0 0 0 op mod op r/m SIDT 1 0 0 1
-286+ LAR/LSL r, r/m 0F 0 0 0 0 0 0 1 op mod reg r/m LGDT 1 0 1 0
-286 only SAVEALL/LOADALL 0F 0 0 0 0 0 1 0 op LIDT 1 0 1 1
-286+ CLTS 0F 0 0 0 0 0 1 1 0 SMSW 1 1 0 0
-386 onlyLOADALL 0F 0 0 0 0 0 1 1 1 LMSW 1 1 1 0
-486+ INVD/WBINVD 0F 0 0 0 0 1 0 0 op INVLPG 1 1 1 1
-386+ MOV cr/dr, r/m 0F 0 0 1 0 0 0 d op 1 1 cr/dr r/m
-386+ MOV tr, r/m 0F 0 0 1 0 0 1 d 0 1 1 tr r/m FP memory format
-386+ conditional jumps (near) 0F 1 0 0 0 cc n +rel f32 0 0
-386+ conditional set r/m 0F 1 0 0 1 cc n mod 0 0 0 r/m i32 0 1
-386+ PUSH/POP FS/GS 0F 1 0 1 0 sg 0 0 op f64 1 0
-486+/386+ CPUID/RSM 0F 1 0 1 0 op 0 1 0 i16 1 1
-386+ bit test r/m, r 0F 1 0 1 op 0 1 1 mod reg r/m
-386+ SHLD/SHRD r, r/m, imm/CL 0F 1 0 1 0 op 1 0 cl mod reg r/m if cl = 0 then +imm8
-386+ IMUL r, r/m 0F 1 0 1 0 1 1 1 1 mod reg r/m
-486+ CMPXCHG r, r/m 0F 1 0 1 1 0 0 0 w mod reg r/m
-386+ LSS r, r/m 0F 1 0 1 1 0 0 1 0 mod reg r/m mod ≠ 11
-op ≠ 11
-386+ LFS/LGS r, r/m 0F 1 0 1 1 0 1 0 op mod reg r/m mod ≠ 11 FP ALU op
-386+ BSF/BSR r, r/m 0F 1 0 1 1 1 1 0 op mod reg r/m FADD 0 0 0
-386+ MOVZX/MOVSX r, r/m 0F 1 0 1 1 op 1 1 w mod reg r/m FMUL 0 0 1
-386+ bit test r/m, imm 0F 1 0 1 1 1 0 1 0 mod 1 op r/m FCOM 0 1 P
-486+ XADD r/m, r 0F 1 1 0 0 0 0 0 w mod reg r/m FSUB 1 0 R
-486+ BSWAP r 0F 1 1 0 0 1 reg FDIV 1 1 R
-x87 instructions FP misc mem
-FP ALU ST(0), mem 1 1 0 1 1 MF 0 mod op r/m mod ≠ 11 FLDENV 0 0 0 0
-FLD mem 1 1 0 1 1 MF 1 mod 0 0 0 r/m mod ≠ 11 FLDCW 0 0 0 1
-FST(P) mem 1 1 0 1 1 MF 1 mod 0 1 P r/m mod ≠ 11 FSTENV 0 0 1 0
-FP misc mem 1 1 0 1 1 op1 1 mod 1 op2 r/m mod ≠ 11 FSTCW 0 0 1 1
-FP ALU ST(0), ST(i) 1 1 0 1 1 d P 0 1 1 op ST(i) op ≠ 01?, not DA E9, not DE D9 FLD m80 0 1 0 1
-FCOM(P) ST(0), ST(i) 1 1 0 1 1 0 0 0 1 1 0 1 P ST(i) FSTP m80 0 1 1 1
-387+ FUCOMPP ST(0), ST(1) 1 1 0 1 1 1 0 0 1 1 1 0 1 0 0 1 FRSTOR 1 0 0 0
-FCOMPP ST(0), ST(i) 1 1 0 1 1 1 1 0 1 1 0 1 1 0 0 1 FSAVE 1 0 1 0
-FLD ST(i) 1 1 0 1 1 0 0 1 1 1 0 0 0 ST(i) FSTCW 1 0 1 1
-FXCH ST(0), ST(i) 1 1 0 1 1 0 0 1 1 1 0 0 1 ST(i) FBLD 1 1 0 0
-FNOP 1 1 0 1 1 0 0 1 1 1 0 1 0 0 0 0 FILD m64 1 1 0 1
-FCHS/FABS 1 1 0 1 1 0 0 1 1 1 1 0 0 0 0 op FBSTP 1 1 1 0
-FTST/FXAM 1 1 0 1 1 0 0 1 1 1 1 0 0 1 0 op FISTP m64 1 1 1 1
-FP load constant 1 1 0 1 1 0 0 1 1 1 1 0 1 op
-FP misc 1 1 0 1 1 0 0 1 1 1 1 1 op SIN/COS/SINCOS/FPREM1: 387+ FP load constant
-FENI/FDISI/FCLEX/FINIT 1 1 0 1 1 0 1 1 1 1 1 0 0 0 op FLD1 0 0 0
-287+ FSETPM 1 1 0 1 1 0 1 1 1 1 1 0 0 1 0 0 FLDL2T 0 0 1
-FFREE(P) ST(i) 1 1 0 1 1 1 P 1 1 1 0 0 0 ST(i) FLDL2E 0 1 0
-FST(P) ST(i) 1 1 0 1 1 1 0 1 1 1 0 1 P ST(i) FLDPI 0 1 1
-387+ FUCOM(P) ST(0), ST(i) 1 1 0 1 1 1 0 1 1 1 1 0 P ST(i) FLDLG2 1 0 0
-287+ FSTSW AX 1 1 0 1 1 1 1 1 1 1 1 0 0 0 0 0 FLDLN2 1 0 1
-FLDZ 1 1 0
-mod addressing mode
-reg general purpose register
-r/m if mod = 11 like reg, else more addressing mode
-seg segment register
-cr/dr/tr control/test/debug register
-w 0: byte instruction; 1: word/dword instruction FP misc
-d if 1, flip operands F2XM1 0 0 0 0
-s 1: force 8 bit immediate FYL2X 0 0 0 1
-cc condition code FPTAN 0 0 1 0
-n negate condition FPATAN 0 0 1 1
-f 0: return near; 1: return far FXTRACT 0 1 0 0
-i 0: no immediate; 1: 16 bit immediate FPREM1 0 1 0 1
-cl 0: shift by 1 or immediate; 1: shift by CL FDECSTP 0 1 1 0
-P 1: pop ST(0) after instruction FINCSTP 0 1 1 1
-R 0: dest = dest op src; 1: dest = src op dest FPREM 1 0 0 0
-imm8 8 bit immediate FYL2XP1 1 0 0 1
-imm16 16 bit immediate FSQRT 1 0 1 0
-imm immediate of operand size FSINCOS 1 0 1 1
-off 16/32 bit absolute address FRNDINT 1 1 0 0
-rel8 8 bit relative address FSCALE 1 1 0 1
-rel relative address of address size FSIN 1 1 1 0
-FCOS 1 1 1 1
-16 bit modr/m byte
-indexed mod mode mod ≠ 11, mod:mode ≠ 00:110 16 bit modes
-absolute 0 0 1 1 0 +disp16 BX+SI 0 0 0
-register 1 1 reg BX+DI 0 0 1
-BP+SI 0 1 0
-32 bit modr/m byte, SIB byte BP+DI 0 1 1
-indexed mod reg mod ≠ 11, reg ≠ 100, mod:reg ≠ 00:101 SI 1 0 0
-absolute 0 0 1 0 1 +disp32 DI 1 0 1
-scaled index 0 0 1 0 0 scale index 1 0 1 +disp32 BP 1 1 0
-SIB mod 1 0 0 scale index base mod ≠ 11, mod:base ≠ 00:101 BX 1 1 1
-register 1 1 reg
-mod 00: no disp, 01: disp8, 10: disp
-base base register (GPR)
-scale scale as a power of 2
-index 100: no index, else index register (GPR)
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0!
+@
+#
+$
+%
+^
+&
+*
+(
+)
+_
++
+}
+{
+}
+|
+\
+]
+[
+'
+"
+;
+:
+?
+/
+.
+>
+,
+<
+a
+b
+c
+d
+e
+f
+g
+h
+i
+j
+k
+l
+m
+n
+o
+p
+q
+r
+s
+t
+u
+v
+w
+x
+y
+z
+~
+`
